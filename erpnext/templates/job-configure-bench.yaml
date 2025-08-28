@@ -18,25 +18,6 @@ spec:
         {{- toYaml . | nindent 8 }}
     {{- end }}
       serviceAccountName: {{ template "erpnext.serviceAccountName" $ }}
-      {{- if .Values.jobs.configure.fixVolume }}
-      initContainers:
-      - name: frappe-bench-ownership
-        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
-        imagePullPolicy: {{ .Values.image.pullPolicy }}
-        command: ['sh', '-c']
-        args:
-          - chown -R "{{ default 1000 .Values.securityContext.runAsUser }}:{{ default 1000 .Values.securityContext.runAsUser }}" /home/frappe/frappe-bench/sites /home/frappe/frappe-bench/logs
-        resources:
-          {{- toYaml .Values.jobs.configure.resources | nindent 10 }}
-        securityContext:
-          # run as root to set ownership
-          runAsUser: 0
-        volumeMounts:
-          - name: sites-dir
-            mountPath: /home/frappe/frappe-bench/sites
-          - name: logs
-            mountPath: /home/frappe/frappe-bench/logs
-      {{- end }}
       securityContext:
         {{- toYaml $.Values.podSecurityContext | nindent 8 }}
       containers:
